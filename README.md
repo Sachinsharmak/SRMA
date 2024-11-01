@@ -25,8 +25,8 @@ SRMA is a robust system resource monitoring application that provides real-time 
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
-cd srma
+git clone https://github.com/Sachinsharmak/SRMA.git
+cd SRMA
 ```
 
 2. Install Python dependencies:
