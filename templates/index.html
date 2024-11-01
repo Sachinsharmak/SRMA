@@ -65,18 +65,12 @@
         }
 
         function clearError() {
-            const errorDiv = document.getElementById('error');
-            errorDiv.style.display = 'none';
+            document.getElementById('error').style.display = 'none';
         }
 
         function updateStatus() {
             fetch('/health')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     const statusDiv = document.getElementById('status');
                     statusDiv.innerHTML = `Status: MongoDB Connected: ${data.mongodb_connected ? '✅' : '❌'} | Documents: ${data.document_count || 0} | Last Update: ${new Date(data.timestamp).toLocaleString()}`;
@@ -98,30 +92,28 @@
                 .then(data => {
                     clearError();
                     const tbody = document.querySelector('tbody');
-                    tbody.innerHTML = '';
-                    
+                    tbody.innerHTML = ''; // Clear the table body
+
                     if (data.length === 0) {
                         displayError('No data available');
                         return;
                     }
 
                     data.forEach(item => {
-                        const row = document.createElement('tr');
-                        const cpuUsage = item.data.cpu?.toFixed(1) || 0;
-                        const memUsage = item.data.mem?.toFixed(1) || 0;
-                        const diskUsage = item.data.disk?.toFixed(1) || 0;
-                        const netRx = ((item.data.net_rx || 0) / 1024 / 1024).toFixed(2);
-                        const netTx = ((item.data.net_tx || 0) / 1024 / 1024).toFixed(2);
-                        
-                        row.innerHTML = `
-                            <td>${new Date(item.timestamp).toLocaleString()}</td>
-                            <td>${cpuUsage}%</td>
-                            <td>${memUsage}%</td>
-                            <td>${diskUsage}%</td>
-                            <td>${netRx} MB</td>
-                            <td>${netTx} MB</td>
-                        `;
-                        tbody.appendChild(row);
+                        const row = tbody.insertRow();
+                        const timestamp = new Date(item.timestamp).toLocaleString();
+                        const cpuUsage = (item.data.cpu || 0).toFixed(1);
+                        const memUsage = (item.data.mem || 0).toFixed(1);
+                        const diskUsage = (item.data.disk || 0).toFixed(1);
+                        const netRx = (item.data.net_rx || 0).toFixed(2);
+                        const netTx = (item.data.net_tx || 0).toFixed(2);
+
+                        row.insertCell().textContent = timestamp;
+                        row.insertCell().textContent = `${cpuUsage}%`;
+                        row.insertCell().textContent = `${memUsage}%`;
+                        row.insertCell().textContent = `${diskUsage}%`;
+                        row.insertCell().textContent = `${netRx} MB`;
+                        row.insertCell().textContent = `${netTx} MB`;
                     });
                 })
                 .catch(error => {
@@ -130,11 +122,9 @@
                 });
         }
 
-        // Update every minute
         setInterval(updateData, 60000);
         setInterval(updateStatus, 60000);
 
-        // Initial updates
         document.addEventListener('DOMContentLoaded', () => {
             updateStatus();
             updateData();
