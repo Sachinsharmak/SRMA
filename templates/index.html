@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Resource Monitor</title>
+    <style>
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fee;
+            border-radius: 4px;
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>System Resource Monitor</h1>
+    
+    <div id="status" class="status">
+        Checking system status...
+    </div>
+    
+    <div id="error" class="error"></div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>CPU Usage</th>
+                <th>Memory Usage</th>
+                <th>Disk Usage</th>
+                <th>Network RX</th>
+                <th>Network TX</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        function displayError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function clearError() {
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'none';
+        }
+
+        function updateStatus() {
+            fetch('/health')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const statusDiv = document.getElementById('status');
+                    statusDiv.innerHTML = `Status: MongoDB Connected: ${data.mongodb_connected ? '✅' : '❌'} | Documents: ${data.document_count || 0} | Last Update: ${new Date(data.timestamp).toLocaleString()}`;
+                })
+                .catch(error => {
+                    console.error('Health check failed:', error);
+                    displayError('Failed to fetch system status');
+                });
+        }
+
+        function updateData() {
+            fetch('/api/data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    clearError();
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        displayError('No data available');
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        const cpuUsage = item.data.cpu?.toFixed(1) || 0;
+                        const memUsage = item.data.mem?.toFixed(1) || 0;
+                        const diskUsage = item.data.disk?.toFixed(1) || 0;
+                        const netRx = ((item.data.net_rx || 0) / 1024 / 1024).toFixed(2);
+                        const netTx = ((item.data.net_tx || 0) / 1024 / 1024).toFixed(2);
+                        
+                        row.innerHTML = `
+                            <td>${new Date(item.timestamp).toLocaleString()}</td>
+                            <td>${cpuUsage}%</td>
+                            <td>${memUsage}%</td>
+                            <td>${diskUsage}%</td>
+                            <td>${netRx} MB</td>
+                            <td>${netTx} MB</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Data fetch failed:', error);
+                    displayError('Failed to fetch monitoring data');
+                });
+        }
+
+        // Update every minute
+        setInterval(updateData, 60000);
+        setInterval(updateStatus, 60000);
+
+        // Initial updates
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+            updateData();
+        });
+    </script>
+</body>
+</html>
