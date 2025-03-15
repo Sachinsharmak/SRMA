@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Fetch MongoDB configuration from environment variables
-MONGO_URI = os.environ.get('MONGO_URI', "mongodb+srv://89272sachin06:LjE1HtHHOYc5Znwi@microblog.5hnpk.mongodb.net/")  # Replace with actual URI if not using env vars
-MONGO_DB = os.environ.get('MONGO_DB', "SRMA")         # Default to "SRMA" if not set
-MONGO_COLLECTION = os.environ.get('MONGO_COLLECTION', "alerts")  # Default to "alerts" if not set
+MONGO_URI = os.environ.get('MONGO_URI', " ")  # Replace with actual URI if not using env vars
+MONGO_DB = os.environ.get('MONGO_DB', " ")         # Default to "SRMA" if not set
+MONGO_COLLECTION = os.environ.get('MONGO_COLLECTION', " ")  # Default to "alerts" if not set
 
 def get_mongodb_client():
     try:
