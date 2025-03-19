@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRMA Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">  <!-- Bootstrap for styling -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <!-- Font Awesome for icons -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure full viewport height */
+        }
+
+        .login-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .login-card h2 {
+          margin-bottom: 20px; /* Added some space below the heading */
+      }
+        .alert {
+            margin-bottom: 15px;  /* Space between alert and form */
+        }
+
+        .form-label{
+          font-weight: bold; /* Make form labels bolder for better readability */
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            width:100% ; /* button taking 100% width*/
+
+        }
+       /* Style the submit button on hover */
+        .btn-primary:hover {
+          background-color: #0056b3; /* Darker shade of blue on hover */
+          border-color: #0056b3;
+      }
+
+
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 class="text-center mb-4"><i class="fas fa-server me-2"></i> SRMA Login</h2> 
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-2">Login</button>
+        </form>
+
+        <p class="text-center mt-3">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>  <!-- Signup Link -->
+    </div>  <!-- Closing div for login-card -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

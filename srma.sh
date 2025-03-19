@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Function to ensure we're running as root
+PID_FILE="/var/run/srma.pid"
+
 check_root() {
     if [ "$EUID" -ne 0 ]; then
         echo "Please run as root (use sudo)"
@@ -8,31 +9,26 @@ check_root() {
     fi
 }
 
-# Function to set up logging
 setup_logging() {
-    local log_dir="/var/log/srma"
-    mkdir -p "$log_dir"
-    chown -R $SUDO_USER:$SUDO_USER "$log_dir"
-    chmod 755 "$log_dir"
+    mkdir -p "/var/log/srma"
+    chown -R ${SUDO_USER:-$USER}:${SUDO_USER:-$USER} "/var/log/srma"
+    chmod 755 "/var/log/srma"
 }
 
-# Function to check if process is running
 is_process_running() {
-    local pname=$1
-    pgrep -f "$pname" >/dev/null
-    return $?
+    [ -f "$PID_FILE" ] && ps -p $(cat "$PID_FILE") > /dev/null 2>&1
 }
 
-# Function to start the Flask app
 start_flask_app() {
-    if ! is_process_running "srma_web.py"; then
+    if ! is_process_running; then
         echo "Starting Flask application..."
-        su - $SUDO_USER -c "cd $(pwd) && python3 ./srma_web.py >> /var/log/srma/web.log 2>&1 &"
+        su - ${SUDO_USER:-$USER} -c "cd $(pwd) && python3 ./srma_web.py >> /var/log/srma/web.log 2>&1 & echo \$! > $PID_FILE"
         sleep 2
-        if is_process_running "srma_web.py"; then
+        if is_process_running; then
             echo "Flask application started successfully"
         else
             echo "Failed to start Flask application"
+            rm -f "$PID_FILE"
             exit 1
         fi
     else
@@ -40,45 +36,43 @@ start_flask_app() {
     fi
 }
 
-# Function to start the monitoring
 start_monitoring() {
     echo "Starting system monitoring..."
     while true; do
         source ./srma_config.sh || exit 1
         source ./srma_monitor.sh || exit 1
         source ./srma_alert.sh || exit 1
-        
+
         if ! monitor_system_resources; then
             echo "System resource monitoring failed, retrying in 60 seconds..."
             sleep 60
             continue
         fi
-        
+
         sleep "${MONITOR_INTERVAL:-60}"
     done >> /var/log/srma/monitor.log 2>&1 &
-    echo "Monitoring started with PID $!"
+    echo $! > "$PID_FILE"
+    echo "Monitoring started with PID $(cat $PID_FILE)"
 }
 
-# Function to stop all components
 stop_application() {
     echo "Stopping SRMA..."
-    pkill -f "srma_web.py"
-    pkill -f "monitor_system_resources"
-    echo "All components stopped"
-}
-
-# Function to get application status
-get_application_status() {
-    if is_process_running "srma_web.py" && is_process_running "monitor_system_resources"; then
-        echo "SRMA is running"
-        return 0
+    if [ -f "$PID_FILE" ]; then
+        kill $(cat "$PID_FILE") && rm -f "$PID_FILE"
+        echo "Application stopped"
     else
-        echo "SRMA is not running"
-        return 1
+        echo "PID file not found. Is SRMA running?"
     fi
 }
 
-# Main execution
+get_application_status() {
+    if is_process_running; then
+        echo "SRMA is running"
+    else
+        echo "SRMA is not running"
+    fi
+}
+
 check_root
 
 case "${1:-start}" in
