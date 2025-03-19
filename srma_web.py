@@ -37,8 +37,8 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', secrets.token_he
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 # Fetch MongoDB configuration from environment variables
-MONGO_URI = os.environ.get('MONGO_URI', "")
-MONGO_DB = os.environ.get('MONGO_DB', "")
+MONGO_URI = os.environ.get('MONGO_URI', "") // Enter you MongoDB Atlas URI
+MONGO_DB = os.environ.get('MONGO_DB', "") // Enter the DataBase
 MONGO_COLLECTION = os.environ.get('MONGO_COLLECTION', "")
 
 def get_mongodb_client():
