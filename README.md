@@ -1,141 +1,105 @@
 # SRMA - System Resource Monitoring Application
 
-SRMA is a robust system resource monitoring application that provides real-time tracking of CPU, memory, and disk usage with configurable alerts and a web interface for visualization.
+SRMA is a real-time system resource monitoring and alerting web application built using **Flask**, **MongoDB Atlas**, and **JWT Authentication**. It provides detailed visualization of system metrics and automated alerts based on customizable thresholds, enabling proactive system health management.
 
-## Features
+---
 
-- Real-time system resource monitoring
-- Configurable warning and critical thresholds
-- Multiple alert methods (email and syslog)
-- Web interface for data visualization
-- MongoDB backend for historical data storage
-- Health check endpoint
-- Flexible configuration options
+## 🚀 Features
 
-## Prerequisites
+- **Real-time System Resource Monitoring**  
+  Monitor CPU, memory, disk, network usage, system load, and temperatures in real-time.
 
+- **Dynamic Dashboard with Interactive Charts**  
+  Visualize system performance metrics through intuitive and interactive dashboards. Includes auto-refresh functionality.
+
+- **User Authentication and Access Control**  
+  Secure user authentication using JWT (JSON Web Token). Supports role-based access (Admin/User).
+
+- **Automated Alert System**  
+  Generate and send alerts for resource thresholds (warning/critical levels) via:
+  - 📧 Email  
+  - 📝 Syslog  
+  - 🔗 Webhooks  
+
+- **Background Data Collection**  
+  Uses Python `threading` and `psutil` for accurate and continuous system resource monitoring.
+
+- **API Key Management**  
+  Supports API keys for secure machine-to-machine communication with optional expiration.
+
+- **Modular and Scalable Architecture**  
+  Easily extendable to add new resource metrics, alert channels, or data export features.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend:** Python, Flask  
+- **Frontend:** Bootstrap, Chart.js  
+- **Database:** MongoDB Atlas  
+- **Authentication:** JWT, Bcrypt  
+- **Monitoring:** Psutil  
+- **Automation & Scripts:** Bash, jq, mongosh  
+- **Deployment:** Runs on Linux environment
+
+---
+
+## ⚙️ Setup and Installation
+
+### Prerequisites
 - Python 3.x
-- MongoDB
-- `jq` command-line JSON processor
-- `bc` command-line calculator
-- Modern web browser for the dashboard
-- Root access for service management
+- MongoDB Atlas account
+- Linux environment
+- SMTP Server (Optional for email alerts)
 
-## Installation
+### Installation Steps
 
-1. Clone the repository:
+1. **Clone the Repository**
+    ```bash
+    git clone https://github.com/yourusername/srma.git
+    cd srma
+    ```
+
+2. **Create and Activate Virtual Environment**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3. **Install Dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Set Environment Variables**
+    Create a `.env` file or export manually:
+    ```bash
+    export MONGO_URI="your_mongodb_uri"
+    export MONGO_DB="SRMA"
+    export JWT_SECRET_KEY="your_jwt_secret_key"
+    export ADMIN_PASSWORD="your_admin_password"
+    ```
+
+5. **Run the Application**
+    ```bash
+    python srma_web.py
+    ```
+
+6. **Access the App**  
+    Visit `http://localhost:5000` in your browser.
+
+---
+
+## 📝 Configuration
+
+Modify `srma.conf` for alert thresholds and monitoring parameters:
 ```bash
-git clone https://github.com/Sachinsharmak/SRMA.git
-cd SRMA
-```
-
-2. Install Python dependencies:
-```bash
-pip3 install -r requirements.txt
-```
-
-3. Create and configure the configuration file:
-```bash
-cp srma.conf.example srma.conf
-vim srma.conf
-```
-
-## Configuration
-
-Edit `srma.conf` to set the following parameters:
-
-- `MONITOR_INTERVAL`: Monitoring frequency in seconds
-- `ALERT_METHODS`: Space-separated list of alert methods ("email" "syslog")
-- `EMAIL`: Alert recipient email address
-- `SYSLOG_SERVER`: Syslog server address
-- `CPU_THRESHOLD`: Critical CPU usage threshold (%)
-- `CPU_WARNING_THRESHOLD`: Warning CPU usage threshold (%)
-- `MEMORY_THRESHOLD`: Critical memory usage threshold (%)
-- `MEMORY_WARNING_THRESHOLD`: Warning memory usage threshold (%)
-- `DISK_THRESHOLD`: Critical disk usage threshold (%)
-- `DISK_WARNING_THRESHOLD`: Warning disk usage threshold (%)
-- `MONGO_URI`: MongoDB connection string
-
-## Usage
-
-SRMA provides a simple command-line interface for management:
-
-```bash
-sudo ./srma.sh [command]
-```
-
-Available commands:
-- `start`: Start the SRMA service
-- `stop`: Stop the SRMA service
-- `restart`: Restart the SRMA service
-- `status`: Check the current status of SRMA
-
-## Web Interface
-
-Access the web dashboard at:
-```
-http://localhost:5000
-```
-
-The dashboard provides:
-- Real-time resource usage graphs
-- Historical data visualization
-- System status overview
-
-## API Endpoints
-
-- `/`: Web dashboard
-- `/api/data`: JSON endpoint for resource data
-- `/health`: Service health check endpoint
-
-## File Structure
-
-```
-srma/
-├── srma.sh              # Main service control script
-├── srma_config.sh       # Configuration management
-├── srma_monitor.sh      # Resource monitoring
-├── srma_alert.sh        # Alert handling
-├── srma_web.py          # Web interface
-├── srma.conf            # Configuration file
-└── /var/log/srma/       # Log directory
-    ├── srma.log         # Main log file
-    └── web.log          # Web interface log
-```
-
-## Logging
-
-Logs are stored in `/var/log/srma/`:
-- `srma.log`: Main application logs
-- `web.log`: Web interface logs
-
-## Security Considerations
-
-- The service requires root access for system monitoring
-- MongoDB security should be configured according to your environment
-- Web interface is accessible only from localhost by default
-- Log directory permissions are managed automatically
-
-## Troubleshooting
-
-1. Check the logs in `/var/log/srma/`
-2. Verify MongoDB connection
-3. Ensure proper permissions
-4. Check configuration file syntax
-5. Verify all required dependencies are installed
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-[License Type] - See LICENSE file for details
-
-## Support
-
-For issues and feature requests, please create an issue in the GitHub repository.
+MONITOR_INTERVAL=60
+EMAIL="admin@example.com"
+SYSLOG_SERVER="localhost"
+ALERT_METHODS="email syslog"
+CPU_THRESHOLD=90
+MEMORY_THRESHOLD=90
+DISK_THRESHOLD=95
+MONGO_URI="your_mongodb_uri"
+MONGO_DB="SRMA"
