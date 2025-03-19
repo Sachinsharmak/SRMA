@@ -56,8 +56,8 @@ SRMA is a real-time system resource monitoring and alerting web application buil
 
 1. **Clone the Repository**
     ```bash
-    git clone https://github.com/yourusername/srma.git
-    cd srma
+    git clone https://github.com/Sachinsharmak/SRMA.git
+    cd SRMA
     ```
 
 2. **Create and Activate Virtual Environment**
